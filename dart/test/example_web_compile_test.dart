@@ -12,7 +12,6 @@ void main() {
     test('dart pub get should run successfully', () async {
       print('CURRENT DIR: ${Directory.current}');
       print('WORKING DIR: ${_exampleWebWorkingDir}');
-      return;
       final result = await _runProcess('dart pub get',
           workingDirectory: _exampleWebWorkingDir);      
       expect(result.exitCode, 0,
@@ -23,7 +22,6 @@ void main() {
       // running this test locally require clean working directory
       print('CURRENT DIR: ${Directory.current}');
       print('WORKING DIR: ${_exampleWebWorkingDir}');
-      return;
       final cleanResult = await _runProcess('dart run build_runner clean',
           workingDirectory: _exampleWebWorkingDir);
       expect(cleanResult.exitCode, 0);
@@ -69,7 +67,7 @@ Future<_CommandResult> _runProcess(String command,
 }
 
 String get _exampleWebWorkingDir {
-  return Directory.current.uri.resolve('./example_web').normalizePath().path;
+  return '${Directory.current}${Platform.pathSeparator}example_web';  
 }
 
 class _CommandResult {
