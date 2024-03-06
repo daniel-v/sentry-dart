@@ -11,7 +11,7 @@ void main() {
   group('Compile example_web', () {
     test('dart pub get should run successfully', () async {
       print('CURRENT DIR: ${Directory.current}');
-      print('WORKING DIR: ${_exampleWebWorkingDir}');
+      print('WORKING DIR: `$_exampleWebWorkingDir`');
       final result = await _runProcess('dart pub get',
           workingDirectory: _exampleWebWorkingDir);      
       expect(result.exitCode, 0,
@@ -67,7 +67,7 @@ Future<_CommandResult> _runProcess(String command,
 }
 
 String get _exampleWebWorkingDir {
-  return '${Directory.current}${Platform.pathSeparator}example_web';  
+  return '${Directory.current.path}${Platform.pathSeparator}example_web';  
 }
 
 class _CommandResult {
