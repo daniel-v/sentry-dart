@@ -9,32 +9,36 @@ import 'package:test/test.dart';
 // https://github.com/getsentry/sentry-dart/issues/1893
 void main() {
   group('Compile example_web', () {
-    test('dart pub get and compilation should run successfully', () async {
-      final result = await _runProcess('dart pub get',
-          workingDirectory: _exampleWebWorkingDir);
-      expect(result.exitCode, 0,
-          reason: 'Could run `dart pub get` for example_web. '
-              'Likely caused by outdated dependencies');
-    // });
-    // test('dart run build_runner build should run successfully', () async {
-      // running this test locally require clean working directory
-      final cleanResult = await _runProcess('dart run build_runner clean',
-          workingDirectory: _exampleWebWorkingDir);
-      expect(cleanResult.exitCode, 0);
-      final compileResult = await _runProcess(
-          'dart run build_runner build -r web -o build --delete-conflicting-outputs',
-          workingDirectory: _exampleWebWorkingDir);
-      expect(compileResult.exitCode, 0,
-          reason: 'Could not compile example_web project');
-      expect(
-          compileResult.stdout,
-          isNot(contains(
-              'Skipping compiling sentry_dart_web_example|web/main.dart')),
-          reason:
-              'Could not compile main.dart, likely because of dart:io import.');
-      expect(compileResult.stdout,
-          contains('build_web_compilers:entrypoint on web/main.dart:Compiled'));
-    });
+    test(
+      'dart pub get and compilation should run successfully',
+      () async {
+        final result = await _runProcess('dart pub get',
+            workingDirectory: _exampleWebWorkingDir);
+        expect(result.exitCode, 0,
+            reason: 'Could run `dart pub get` for example_web. '
+                'Likely caused by outdated dependencies');
+        // running this test locally require clean working directory
+        final cleanResult = await _runProcess('dart run build_runner clean',
+            workingDirectory: _exampleWebWorkingDir);
+        expect(cleanResult.exitCode, 0);
+        final compileResult = await _runProcess(
+            'dart run build_runner build -r web -o build --delete-conflicting-outputs',
+            workingDirectory: _exampleWebWorkingDir);
+        expect(compileResult.exitCode, 0,
+            reason: 'Could not compile example_web project');
+        expect(
+            compileResult.stdout,
+            isNot(contains(
+                'Skipping compiling sentry_dart_web_example|web/main.dart')),
+            reason:
+                'Could not compile main.dart, likely because of dart:io import.');
+        expect(
+            compileResult.stdout,
+            contains(
+                'build_web_compilers:entrypoint on web/main.dart:Compiled'));
+      },
+      timeout: Timeout(const Duration(minutes: 1)), // double of detault timeout
+    ); 
   });
 }
 
@@ -62,9 +66,9 @@ Future<_CommandResult> _runProcess(String command,
     cancelOnError: true,
     onDone: () {
       stdoutCompleter.complete();
-    },    
+    },
   );
-  await stdoutCompleter.future;  
+  await stdoutCompleter.future;
   final processOut = utf8.decode(buffer);
   int exitCode = await process.exitCode;
   return _CommandResult(exitCode: exitCode, stdout: processOut);
