@@ -26,20 +26,4 @@ jobs:
           dart pub get          
           dart test -p vm --test-randomize-ordering-seed=random --chain-stack-traces test/example_web_compile_test.dart
 
-      - name: Install webdev
-        if: runner.os != 'Windows'
-        run: dart pub global activate webdev
-
-      - name: Build example
-        run: |
-          cd example
-          dart pub get
-          dart compile aot-snapshot bin/example.dart
-
-      - name: Build Web example
-        if: runner.os != 'Windows'
-        run: |
-          cd example_web
-          dart pub get
-          webdev build
 
