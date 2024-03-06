@@ -10,18 +10,14 @@ import 'package:test/test.dart';
 void main() {
   group('Compile example_web', () {
     test('dart pub get should run successfully', () async {
-      print('CURRENT DIR: ${Directory.current}');
-      print('WORKING DIR: `$_exampleWebWorkingDir`');
       final result = await _runProcess('dart pub get',
-          workingDirectory: _exampleWebWorkingDir);      
+          workingDirectory: _exampleWebWorkingDir);
       expect(result.exitCode, 0,
           reason: 'Could run `dart pub get` for example_web. '
               'Likely caused by outdated dependencies');
     });
     test('dart run build_runner build should run successfully', () async {
       // running this test locally require clean working directory
-      print('CURRENT DIR: ${Directory.current}');
-      print('WORKING DIR: ${_exampleWebWorkingDir}');
       final cleanResult = await _runProcess('dart run build_runner clean',
           workingDirectory: _exampleWebWorkingDir);
       expect(cleanResult.exitCode, 0);
@@ -57,17 +53,25 @@ Future<_CommandResult> _runProcess(String command,
   // forward standard streams
   unawaited(stderr.addStream(process.stderr));
   final buffer = <int>[];
-  await for (final units in process.stdout) {
-    buffer.addAll(units);
-    stdout.add(units);
-  }
+  final stdoutCompleter = Completer.sync();
+  process.stdout.listen(
+    (units) {
+      buffer.addAll(units);
+      stdout.add(units);
+    },
+    cancelOnError: true,
+    onDone: () {
+      stdoutCompleter.complete();
+    },    
+  );
+  await stdoutCompleter.future;  
   final processOut = utf8.decode(buffer);
   int exitCode = await process.exitCode;
   return _CommandResult(exitCode: exitCode, stdout: processOut);
 }
 
 String get _exampleWebWorkingDir {
-  return '${Directory.current.path}${Platform.pathSeparator}example_web';  
+  return '${Directory.current.path}${Platform.pathSeparator}example_web';
 }
 
 class _CommandResult {
